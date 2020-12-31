@@ -1,0 +1,1028 @@
+Index: DB_Script/SFSF/RESQ_INIT_ORCL.sql
+===================================================================
+--- DB_Script/SFSF/RESQ_INIT_ORCL.sql	(revision 7196)
++++ DB_Script/SFSF/RESQ_INIT_ORCL.sql	(working copy)
+@@ -77,6 +77,8 @@
+ INSERT INTO GLT_RQ_SEQUENCES(TABLE_NAME, LAST_SEQUENCE_NO)VALUES ('GLT_RQ_GRP_USRS', 100);
+ INSERT INTO GLT_RQ_SEQUENCES(TABLE_NAME, LAST_SEQUENCE_NO)VALUES ('GLT_RQ_GRP_TMPL', 100);
+ INSERT INTO GLT_RQ_SEQUENCES(TABLE_NAME, LAST_SEQUENCE_NO)VALUES ('GLT_RQ_USR_BUSI_ROLE', 1);
++INSERT INTO GLT_RQ_SEQUENCES(TABLE_NAME, LAST_SEQUENCE_NO)VALUES ('GLT_RQ_MAIL_EVENT', 1);
++INSERT INTO GLT_RQ_SEQUENCES(TABLE_NAME, LAST_SEQUENCE_NO)VALUES ('GLT_RQ_MAIL_EVENT_DETAILS', 1);
+ 
+ END LOOP;
+ COMMIT;
+Index: DB_Script/SFSF/RESQ_ORCL.sql
+===================================================================
+--- DB_Script/SFSF/RESQ_ORCL.sql	(revision 7196)
++++ DB_Script/SFSF/RESQ_ORCL.sql	(working copy)
+@@ -3074,4 +3074,41 @@
+ STORAGE (
+          INITIAL     64K
+          NEXT        1M
+-        );
+\ No newline at end of file
++        );
++        
++-- Added for Mail event changes start
++CREATE TABLE GLT_RQ_MAIL_EVENT(	
++    ID 			NUMBER(10,0) PRIMARY KEY, 
++	EVENT_ID    NVARCHAR2(100) NOT NULL, 
++	EVENT_DESC  NVARCHAR2(200) NOT NULL, 
++	USER_DEF_01 NVARCHAR2(100) NOT NULL, 
++	USER_DEF_02 NVARCHAR2(100), 
++	USER_DEF_03 NVARCHAR2(100), 
++	USER_DEF_04 NVARCHAR2(100), 
++	USER_DEF_05 NVARCHAR2(100)
++ );
++ 
++CREATE TABLE GLT_RQ_MAIL_EVENT_DETAILS(	
++	ID 				  NUMBER(10,0) PRIMARY KEY, 
++	EVENT_ID		  NVARCHAR2(100), 
++	MAIL_MSG_SUFFIX   NVARCHAR2(20), 
++	SUBJECT_KEY 	  NVARCHAR2(100), 
++	SUBJECT_VALUE 	  NVARCHAR2(200), 
++	CONTENT_KEY 	  NVARCHAR2(100), 
++	CONTENT_VALUE 	  CLOB, 
++	CREATED_BY 		  NUMBER(10,0) NOT NULL ENABLE, 
++	CREATE_DATE 	  DATE NOT NULL ENABLE, 
++	CREATE_TIME 	  DATE NOT NULL ENABLE, 
++	LAST_UPDATED_BY   NUMBER(10,0), 
++	LAST_UPDATE_DATE  DATE, 
++	LAST_UPDATE_TIME  DATE, 
++	USER_DEF_01 	  NVARCHAR2(100), 
++	USER_DEF_02 	  NVARCHAR2(100), 
++	USER_DEF_03 	  NVARCHAR2(100), 
++	USER_DEF_04 	  NVARCHAR2(100), 
++	USER_DEF_05 	  NVARCHAR2(100)
++ );
++ -- Added for Mail event changes ends
++ 
++ 
++ 
+\ No newline at end of file
+Index: source/MessagesBundleCustom1_en.properties
+===================================================================
+--- source/MessagesBundleCustom1_en.properties	(revision 7221)
++++ source/MessagesBundleCustom1_en.properties	(working copy)
+@@ -1896,6 +1896,7 @@
+ 
+ ResQ.Upload = Upload
+ RESQ.UPLOAD.BUSINESS.ROLES.DATA=Upload Business Role Scope
++RESQ.MODIFY.MAIL.EVENT.CONTENT=Mail Event
+ RESQ.UPLOAD.DATA.OWNER.NAMES = Owner Names
+ RESQ.UPLOAD.DATA.USER.GROUP.NAME=Group Name
+ RESQ.UPLOAD.DATA.USER.GROUP.DESCP=Group Description
+@@ -1933,6 +1934,18 @@
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS = Mass data uploaded successfully.
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS.WITH.SOME.ERROR= Mass data uploaded with errors.Please see the logs.
+ 
++#Fields related to mail events starts
++RESQ.DOWNLOAD.MAIL.EVENTS.TEMPLATE.TO.MODIFY= Download mail event template to modify
++RESQ.UPLOAD.MAIL.EVENT.EXCEL.FILE= Upload mail event excel file(.xls)
++RESQ.UPLOAD.MAIL.EVENT.SHEET.NAME= Mail Event
++RESQ.UPLOAD.MAIL.EVENT.NAME=Event Name
++RESQ.UPLOAD.MAIL.SUBJECT.KEY=Subject Key 
++RESQ.UPLOAD.MAIL.SUBJECT.VALUE=Subject Text
++RESQ.UPLOAD.MAIL.BODY.KEY=Body Key
++RESQ.UPLOAD.MAIL.BODY.TEXT=Body Text
++#Fields related to mail events ends
++
++
+ RESQ.BUSINESS.ROLE.DATA.UPLOAD.SUCCESSS.WITH.SOME.ERROR=Business Role Scope Data is uploaded with following error(s).
+ RESQ.MASS.DATA.UPLOAD.ERROR.INVALID.OWNER.NAME=Inactive/Invalid OWNER_NAME
+ RESQ.MASS.DATA.UPLOAD.ERROR.CAN.NOT.DEACTIVATE=Can not deactivate as it is associated with open request(s)
+Index: source/MessagesBundleCustom2_en.properties
+===================================================================
+--- source/MessagesBundleCustom2_en.properties	(revision 7221)
++++ source/MessagesBundleCustom2_en.properties	(working copy)
+@@ -1879,6 +1879,7 @@
+ 
+ ResQ.Upload = Upload
+ RESQ.UPLOAD.BUSINESS.ROLES.DATA = Upload Business Roles Data
++RESQ.MODIFY.MAIL.EVENT.CONTENT=Mail Event
+ RESQ.UPLOAD.DATA.OWNER.NAMES = Owner Names
+ RESQ.UPLOAD.DATA.ROLES = Role Name
+ RESQ.UPLOAD.DATA.ROLES.DESCP = Role Description
+@@ -1902,6 +1903,17 @@
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS = Mass data uploaded successfully.
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS.WITH.SOME.ERROR= Mass data uploaded with errors.Please see the logs.
+ 
++#Fields related to mail events starts
++RESQ.DOWNLOAD.MAIL.EVENTS.TEMPLATE.TO.MODIFY= Download mail event template to modify
++RESQ.UPLOAD.MAIL.EVENT.EXCEL.FILE= Upload mail event excel file(.xls)
++RESQ.UPLOAD.MAIL.EVENT.SHEET.NAME= Mail Event
++RESQ.UPLOAD.MAIL.EVENT.NAME=Event Name
++RESQ.UPLOAD.MAIL.SUBJECT.KEY=Subject Key 
++RESQ.UPLOAD.MAIL.SUBJECT.VALUE=Subject Text
++RESQ.UPLOAD.MAIL.BODY.KEY=Body Key
++RESQ.UPLOAD.MAIL.BODY.TEXT=Body Text
++#Fields related to mail events ends
++
+ RESQ.EMAIL.ACCESS.REQUEST.SUBMIT.SUBJECT.REGULAR=Greenlight EBCP Application ($SYSTEM_NAME) - $REQUESTTYPE Request Submitted for Approval
+ RESQ.EMAIL.ACCESS.REQUEST.RESUBMIT.SUBJECT.REGULAR=Greenlight EBCP Application ($SYSTEM_NAME) - $REQUESTTYPE Request Resubmitted for Approval
+ RESQ.EMAIL.ACCESS.REQUEST.SUBMIT.CONTENTS.REGULAR=<html><body>User $REQUESTEDBY has submitted the request for $REQUESTTYPE.<br/><br/>Following are the request details<br/><br/><table cellspacing="0" cellpadding="0"><tr><td>Request Id</td><td>&emsp;:&emsp;</td><td>RESQ#$REQUESTID</td></tr><tr><td>Request Date</td><td>&emsp;:&emsp;</td><td>$REQUESTDATE</td></tr><tr><td>Requestor</td><td>&emsp;:&emsp;</td><td>$REQUESTEDFOR</td></tr><tr><td>Request Type</td><td>&emsp;:&emsp;</td><td>$REQUESTTYPE</td></tr><tr><td>Request Purpose</td><td>&emsp;:&emsp;</td><td>$REQUESTPURPOSE</td></tr><tr><td>Criticality</td><td>&emsp;:&emsp;</td><td>$CRITICALITY</td></tr><tr><td>Request Status</td><td>&emsp;:&emsp;</td><td>$REQUESTSTATUS</td></tr></table><br/><br/>Please login into the Greenlight EBCP application using the following link: <br/>$RESQ_URL<br/><br/>Note: This is an automated mail. Please do not reply.<br/>--------------------------------------------------------------<br/>Administrator - Greenlight EBCP Application</body></html>
+Index: source/MessagesBundle_en.properties
+===================================================================
+--- source/MessagesBundle_en.properties	(revision 7221)
++++ source/MessagesBundle_en.properties	(working copy)
+@@ -1896,6 +1896,7 @@
+ 
+ ResQ.Upload = Upload
+ RESQ.UPLOAD.BUSINESS.ROLES.DATA=Upload Business Roles
++RESQ.MODIFY.MAIL.EVENT.CONTENT=Mail Event
+ RESQ.UPLOAD.DATA.OWNER.NAMES = Owner Names
+ RESQ.UPLOAD.DATA.USER.GROUP.NAME=Group Name
+ RESQ.UPLOAD.DATA.USER.GROUP.DESCP=Group Description
+@@ -1933,6 +1934,17 @@
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS = Mass data uploaded successfully.
+ RESQ.MASS.DATA.UPLOAD.SUCCESSS.WITH.SOME.ERROR= Mass data uploaded with errors.Please see the logs.
+ 
++#Fields related to mail events starts
++RESQ.DOWNLOAD.MAIL.EVENTS.TEMPLATE.TO.MODIFY= Download mail event template to modify
++RESQ.UPLOAD.MAIL.EVENT.EXCEL.FILE= Upload mail event excel file(.xls)
++RESQ.UPLOAD.MAIL.EVENT.SHEET.NAME= Mail Event
++RESQ.UPLOAD.MAIL.EVENT.NAME=Event Name
++RESQ.UPLOAD.MAIL.SUBJECT.KEY=Subject Key 
++RESQ.UPLOAD.MAIL.SUBJECT.VALUE=Subject Text
++RESQ.UPLOAD.MAIL.BODY.KEY=Body Key
++RESQ.UPLOAD.MAIL.BODY.TEXT=Body Text
++#Fields related to mail events ends
++
+ RESQ.BUSINESS.ROLE.DATA.UPLOAD.SUCCESSS.WITH.SOME.ERROR=Business Role Data is uploaded with following error(s).
+ RESQ.MASS.DATA.UPLOAD.ERROR.INVALID.OWNER.NAME=Inactive/Invalid OWNER_NAME
+ RESQ.MASS.DATA.UPLOAD.ERROR.CAN.NOT.DEACTIVATE=Can not deactivate as it is associated with open request(s)
+Index: source/com/greenlight/rqAdapter/dao/resqDAO/AccessRequestDao.java
+===================================================================
+--- source/com/greenlight/rqAdapter/dao/resqDAO/AccessRequestDao.java	(revision 7224)
++++ source/com/greenlight/rqAdapter/dao/resqDAO/AccessRequestDao.java	(working copy)
+@@ -4457,7 +4457,7 @@
+ 				ceEntity="errorMessage"; 
+ 			}
+ 			
+-		  	XMLInputFactory inputFactory = XMLInputFactory.newFactory();
++		  	XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+ 		  	inputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+ 		  	XMLStreamReader reader = inputFactory.createXMLStreamReader(new ByteArrayInputStream(sfObjectXml.getBytes("UTF-8")));
+ 		  	 String returnstr="";
+@@ -4518,7 +4518,7 @@
+ 		private static String getEntryFromRequestXml(String sfObjectXml ) throws IOException, XMLStreamException {
+ 			_logger.debug("Start::getEntryFromRequestXml");
+ 			String ceEntity="modification"; 
+-		  	XMLInputFactory inputFactory = XMLInputFactory.newFactory();
++		  	XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+ 		  	inputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+ 		  	XMLStreamReader reader = inputFactory.createXMLStreamReader(new ByteArrayInputStream(sfObjectXml.getBytes("UTF-8")));
+ 		    String returnstr="";
+Index: source/com/greenlight/rqAdapter/dao/resqDAO/MailEventDAO.java
+===================================================================
+--- source/com/greenlight/rqAdapter/dao/resqDAO/MailEventDAO.java	(revision 0)
++++ source/com/greenlight/rqAdapter/dao/resqDAO/MailEventDAO.java	(revision 0)
+@@ -0,0 +1,192 @@
++package com.greenlight.rqAdapter.dao.resqDAO;
++
++import java.io.OutputStream;
++import java.sql.PreparedStatement;
++import java.sql.ResultSet;
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Locale;
++
++import org.apache.log4j.Logger;
++
++import com.greenlight.rqAdapter.dao.GenericDbMessages;
++import com.greenlight.rqAdapter.dao.connection.XAppConnection;
++import com.greenlight.rqAdapter.dao.connection.XAppDBConnectionManager;
++import com.greenlight.rqAdapter.dao.tables.resqTables.TableRQMailEventDetail;
++import com.greenlight.rqAdapter.dao.tables.resqTables.TableRQUsers;
++import com.greenlight.rqAdapter.framework.messagebundle.I18nUtil;
++import com.greenlight.rqAdapter.framework.security.User;
++import com.greenlight.rqAdapter.logs.Log;
++import com.greenlight.rqAdapter.parser.GenericFileParser;
++import com.greenlight.rqAdapter.parser.XLSFileParser;
++import com.greenlight.rqAdapter.utils.XAppConstants;
++import com.greenlight.rqAdapter.utils.XAppUtils;
++
++import jxl.Workbook;
++import jxl.WorkbookSettings;
++import jxl.write.Label;
++import jxl.write.WritableCellFormat;
++import jxl.write.WritableFont;
++import jxl.write.WritableSheet;
++import jxl.write.WritableWorkbook;
++import jxl.write.WriteException;
++
++public class MailEventDAO {
++
++	private MailEventDAO() {
++		super();
++	}
++
++	private static final Logger LOG = Log.getCustomLogger();
++
++	public static void getXLSDownloadForMailEvent(Integer systemID, Locale locale, OutputStream os) {
++		LOG.info("MailEventDao :: Start of  getXLSDownloadForMailEvent");
++		List data = null;
++		try {
++			int sheetCount = 0;
++
++			List columnList = new ArrayList();
++			List eventAndContentList = new ArrayList<>();
++
++			WorkbookSettings ws = new WorkbookSettings();
++			ws.setLocale(locale);
++			WritableWorkbook workbook = Workbook.createWorkbook(os, ws);
++
++			WritableSheet eventSheet = workbook
++					.createSheet(I18nUtil.getString(locale, XAppConstants.MAIL_EVENT_SHEET_NAME), sheetCount);
++			createXLSDataForEvents(systemID, eventAndContentList, eventSheet, locale);
++
++			workbook.write();
++			workbook.close();
++
++		} catch (Exception e) {
++			LOG.error("MailEventDao :: getXLSDownloadForMailEvent :: ERROR : ", e);
++		} finally {
++			LOG.info("MailEventDao:: Finished getXLSDownloadForMailEvent");
++		}
++	}// End of getXLSDownloadBRData
++
++	private static void createXLSDataForEvents(Integer systemId, List eventAndContentList, WritableSheet ownrSheet,
++			java.util.Locale locale) throws WriteException {
++		LOG.info("MailEventDAO:: Start createXLSDataForOwnerNames");
++		/* Format the Font */
++		WritableFont wf = new WritableFont(WritableFont.ARIAL, 10, WritableFont.BOLD);
++		WritableCellFormat labelFormat = new WritableCellFormat(wf);
++		labelFormat.setWrap(false);
++		// write labels
++		int col = 0;
++		Label label = new Label(col++, 0, I18nUtil.getString(locale, XAppConstants.MAIL_EVENT_NAME), labelFormat);
++		ownrSheet.addCell(label);
++		label = new Label(col++, 0, I18nUtil.getString(locale, XAppConstants.MAIL_SUBJECT_KEY), labelFormat);
++		ownrSheet.addCell(label);
++		label = new Label(col++, 0, I18nUtil.getString(locale, XAppConstants.MAIL_SUBJECT_VALUE), labelFormat);
++		ownrSheet.addCell(label);
++		label = new Label(col++, 0, I18nUtil.getString(locale, XAppConstants.MAIL_BODY_KEY), labelFormat);
++		ownrSheet.addCell(label);
++		label = new Label(col, 0, I18nUtil.getString(locale, XAppConstants.MAIL_BODY_TEXT), labelFormat);
++		ownrSheet.addCell(label);
++
++		// write Data
++
++		WritableFont wf1 = new WritableFont(WritableFont.ARIAL, 10, WritableFont.NO_BOLD);
++		WritableCellFormat stringFormat = new WritableCellFormat(wf1);
++		WritableCellFormat stringFormatWrap = new WritableCellFormat(wf1);
++		stringFormat.setWrap(false);
++		stringFormatWrap.setWrap(true);
++		int row = 1;
++		int srNo = 1;
++		col = 0;
++		for (Iterator itr1 = ownerNameList.iterator(); itr1.hasNext();) {
++			TableRQUsers tableRQUsers = (TableRQUsers) itr1.next();
++			for (int i = 0; i < 4; i++) {
++				col = 0;
++				ownrSheet.setColumnView(col, 30);
++				Label datacell = new Label(col++, row, XAppUtils.getNullableString(tableRQUsers._getUserName()),
++						stringFormat);
++				ownrSheet.addCell(datacell);
++				ownrSheet.setColumnView(col, 30);
++				datacell = new Label(col++, row, XAppUtils.getNullableString(tableRQUsers._getFirstName()),
++						stringFormat);
++				ownrSheet.addCell(datacell);
++				ownrSheet.setColumnView(col, 30);
++				datacell = new Label(col++, row, XAppUtils.getNullableString(tableRQUsers._getLastName()),
++						stringFormat);
++				ownrSheet.addCell(datacell);
++				ownrSheet.setColumnView(col, 50);
++				datacell = new Label(col, row, XAppUtils.getNullableString(tableRQUsers._getEmailId()), stringFormat);
++				ownrSheet.addCell(datacell);
++			}
++			row++;
++		}
++
++		LOG.info("MailEventDAO:: Finished createXLSDataForEvents");
++	}// end of method createXLSDataForOwnerNames
++
++	public static GenericDbMessages uploadAndUpdateTheEmailEvents(String filePath, User loggedUser,
++			java.util.Locale locale) {
++		LOG.debug("MailEventDAO :: uploadAndUpdateTheEmailEvents :: START");
++
++		String absFilePath = filePath;
++
++		XLSFileParser genFileParser = (XLSFileParser) GenericFileParser.getIntance(absFilePath);
++
++		LOG.debug("MailEventDAO :: uploadAndUpdateTheEmailEvents :: ENDS");
++
++		try {
++			genFileParser.open(absFilePath, I18nUtil.getString(locale, XAppConstants.MAIL_EVENT_SHEET_NAME));
++
++			List rowData = null;
++			while (true) {
++				int counter = genFileParser.getRowCounter();
++				rowData = genFileParser.read(counter);
++				if (rowData == null) {
++					break;
++				}
++
++			}
++		} catch (Exception e) {
++			e.printStackTrace();
++			LOG.error("Exception while reading the file ", e);
++		}
++		return null;
++	}
++
++	public static List getEventDetails(Integer systemId) {
++		List eventWithDetailsList = new ArrayList<>();
++		XAppConnection xAppConnection = null;
++		PreparedStatement statement = null;
++		String selectString = "";
++		ResultSet rs = null;
++
++		try {
++			xAppConnection = XAppDBConnectionManager.getInstance().getConnection();
++			selectString = "SELECT EVENT_ID,SUBJECT_KEY,SUBJECT_VALUE,CONTENT_KEY,CONTENT_KEY"
++					+ " FROM GLT_RQ_USERS WHERE RQ_SYSTEM_ID=?";
++			statement = xAppConnection.prepareStatement(selectString);
++			statement.setInt(1, systemId.intValue());
++			rs = statement.executeQuery();
++
++			while (rs.next()) {
++				TableRQMailEventDetail tableRQUsers = new TableRQMailEventDetail();
++				tableRQUsers.setEventId(rs.getString("EVENT_ID"));
++				tableRQUsers.setSubjectKey(rs.getString("SUBJECT_KEY"));
++				tableRQUsers.setSubjectValue(rs.getString("SUBJECT_VALUE"));
++				tableRQUsers.setContentKey(rs.getString("CONTENT_KEY"));
++				tableRQUsers.setContentValue(rs.getString("CONTENT_KEY"));
++				eventWithDetailsList.add(tableRQUsers);
++			}
++			LOG.debug("MailEventDAO :: getEventDetails :: list=[" + eventWithDetailsList.size() + "]");
++		} catch (Exception e) {
++			LOG.error("MailEventDAO :: getEventDetails :: ERROR : " + e);
++		} finally {
++			try {
++				XAppUtils.closeOpenCursors(xAppConnection, statement, rs);
++			} catch (Exception e) {
++				LOG.error(e.getMessage(), e);
++			}
++		}
++		return eventWithDetailsList;
++	} // end of method getUserList
++
++} // End of class
+Index: source/com/greenlight/rqAdapter/dao/tables/resqTables/TableRQMailEventDetail.java
+===================================================================
+--- source/com/greenlight/rqAdapter/dao/tables/resqTables/TableRQMailEventDetail.java	(revision 0)
++++ source/com/greenlight/rqAdapter/dao/tables/resqTables/TableRQMailEventDetail.java	(revision 0)
+@@ -0,0 +1,193 @@
++package com.greenlight.rqAdapter.dao.tables.resqTables;
++
++import java.sql.Time;
++import java.util.Date;
++
++public class TableRQMailEventDetail {
++
++	public static final String DATABASE_TABLE_NAME = "GLT_RQ_MAIL_EVENT_DETAILS";
++	
++	private Integer id;
++	private String eventId;
++	private String mailMsgSuffix;
++	private String subjectKey;
++	private String subjectValue;
++	private String contentKey;
++	private String contentValue;
++	private String createdBy = "";
++	private Date creationDate;
++	private Time creationTime;
++	private String creationDateString = "";
++
++	private String lastUpdatedBy = "";
++	private Date lastUpdateDate;
++	private Time lastUpdateTime;
++	private String lastUpdateDateString = "";
++
++	private String userDef1;
++	private String userDef2;
++	private String userDef3;
++	private String userDef4;
++	private String userDef5;
++
++	public Integer getId() {
++		return id;
++	}
++
++	public void setId(Integer id) {
++		this.id = id;
++	}
++
++	public String getEventId() {
++		return eventId;
++	}
++
++	public void setEventId(String eventId) {
++		this.eventId = eventId;
++	}
++
++	public String getMailMsgSuffix() {
++		return mailMsgSuffix;
++	}
++
++	public void setMailMsgSuffix(String mailMsgSuffix) {
++		this.mailMsgSuffix = mailMsgSuffix;
++	}
++
++	public String getSubjectKey() {
++		return subjectKey;
++	}
++
++	public void setSubjectKey(String subjectKey) {
++		this.subjectKey = subjectKey;
++	}
++
++	public String getSubjectValue() {
++		return subjectValue;
++	}
++
++	public void setSubjectValue(String subjectValue) {
++		this.subjectValue = subjectValue;
++	}
++
++	public String getContentKey() {
++		return contentKey;
++	}
++
++	public void setContentKey(String contentKey) {
++		this.contentKey = contentKey;
++	}
++
++	public String getContentValue() {
++		return contentValue;
++	}
++
++	public void setContentValue(String contentValue) {
++		this.contentValue = contentValue;
++	}
++
++	public String getCreatedBy() {
++		return createdBy;
++	}
++
++	public void setCreatedBy(String createdBy) {
++		this.createdBy = createdBy;
++	}
++
++	public Date getCreationDate() {
++		return creationDate;
++	}
++
++	public void setCreationDate(Date creationDate) {
++		this.creationDate = creationDate;
++	}
++
++	public Time getCreationTime() {
++		return creationTime;
++	}
++
++	public void setCreationTime(Time creationTime) {
++		this.creationTime = creationTime;
++	}
++
++	public String getCreationDateString() {
++		return creationDateString;
++	}
++
++	public void setCreationDateString(String creationDateString) {
++		this.creationDateString = creationDateString;
++	}
++
++	public String getLastUpdatedBy() {
++		return lastUpdatedBy;
++	}
++
++	public void setLastUpdatedBy(String lastUpdatedBy) {
++		this.lastUpdatedBy = lastUpdatedBy;
++	}
++
++	public Date getLastUpdateDate() {
++		return lastUpdateDate;
++	}
++
++	public void setLastUpdateDate(Date lastUpdateDate) {
++		this.lastUpdateDate = lastUpdateDate;
++	}
++
++	public Time getLastUpdateTime() {
++		return lastUpdateTime;
++	}
++
++	public void setLastUpdateTime(Time lastUpdateTime) {
++		this.lastUpdateTime = lastUpdateTime;
++	}
++
++	public String getLastUpdateDateString() {
++		return lastUpdateDateString;
++	}
++
++	public void setLastUpdateDateString(String lastUpdateDateString) {
++		this.lastUpdateDateString = lastUpdateDateString;
++	}
++
++	public String getUserDef1() {
++		return userDef1;
++	}
++
++	public void setUserDef1(String userDef1) {
++		this.userDef1 = userDef1;
++	}
++
++	public String getUserDef2() {
++		return userDef2;
++	}
++
++	public void setUserDef2(String userDef2) {
++		this.userDef2 = userDef2;
++	}
++
++	public String getUserDef3() {
++		return userDef3;
++	}
++
++	public void setUserDef3(String userDef3) {
++		this.userDef3 = userDef3;
++	}
++
++	public String getUserDef4() {
++		return userDef4;
++	}
++
++	public void setUserDef4(String userDef4) {
++		this.userDef4 = userDef4;
++	}
++
++	public String getUserDef5() {
++		return userDef5;
++	}
++
++	public void setUserDef5(String userDef5) {
++		this.userDef5 = userDef5;
++	}
++
++}
+Index: source/com/greenlight/rqAdapter/ui/actions/resqActions/RMailEventAction.java
+===================================================================
+--- source/com/greenlight/rqAdapter/ui/actions/resqActions/RMailEventAction.java	(revision 0)
++++ source/com/greenlight/rqAdapter/ui/actions/resqActions/RMailEventAction.java	(revision 0)
+@@ -0,0 +1,158 @@
++package com.greenlight.rqAdapter.ui.actions.resqActions;
++
++import java.sql.SQLException;
++import java.util.Enumeration;
++import java.util.Locale;
++
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++
++import org.apache.commons.lang3.StringUtils;
++import org.apache.log4j.Logger;
++
++import com.greenlight.rqAdapter.dao.GenericDbMessages;
++import com.greenlight.rqAdapter.dao.SystemDAO;
++import com.greenlight.rqAdapter.dao.connection.XAppConnection;
++import com.greenlight.rqAdapter.dao.resqDAO.MailEventDAO;
++import com.greenlight.rqAdapter.exceptions.XAppActionException;
++import com.greenlight.rqAdapter.framework.actions.XAppAction;
++import com.greenlight.rqAdapter.framework.actions.XAppActionDetails;
++import com.greenlight.rqAdapter.framework.messagebundle.I18nUtil;
++import com.greenlight.rqAdapter.framework.security.User;
++import com.greenlight.rqAdapter.logs.Log;
++import com.greenlight.rqAdapter.utils.XAppConstants;
++import com.greenlight.rqAdapter.utils.XAppListener;
++import com.greenlight.rqAdapter.utils.XAppUtils;
++import com.oreilly.servlet.MultipartRequest;
++
++import de.dominikschadow.javasecurity.csrf.CSRFTokenHandler;
++
++public class RMailEventAction implements XAppAction {
++
++	private static final String GEN_DB_MESSAGES = "GenDbMessages";
++	private static final String GEN_DB_MESSAGES_1 = "GenDbMessages1";
++	private static final String SHOW_MAIN_SCREEN = "showMainScreen";
++	private static final Logger LOG = Log.getCustomLogger();
++
++	@Override
++	public String execute(HttpServletRequest request, HttpServletResponse response, XAppActionDetails actionDetails)
++			throws XAppActionException {
++		String returnPage = "/errorPage.jsp";
++		XAppConnection xAppConnection = null;
++		Locale locale = (Locale) request.getSession().getAttribute("LOGIN_USER_LOCALE");
++		User loggedUser = (User) request.getSession().getAttribute("CURRENT_USER");
++
++		try {
++
++			LOG.info("RMailEventAction[operation=" + actionDetails.getActionId() + "]");
++
++			if (("uploadMailEvent.do").equalsIgnoreCase(actionDetails.getActionId().trim())) {
++
++				GenericDbMessages dbMessages = new GenericDbMessages();// message for business role definition sheet
++				GenericDbMessages genDbMessages = new GenericDbMessages();// message for user group sheet
++				String operation = "";
++				MultipartRequest multi = null;
++				String docPathOnServer = "";
++				String fileNameString = "";
++				String uploadFile = "";
++				try {
++					docPathOnServer = XAppListener.CROSS_APP_HOME 
++							+ XAppConstants.DOCS_FOLDER + System.getProperty("file.separator");
++					LOG.debug("docPathOnServer = " + docPathOnServer);
++					System.out.println("docPathOnServer = " + docPathOnServer);
++
++					operation = request.getParameter("operation");
++					LOG.debug("[operation=" + operation + "]");
++
++					if (operation == null) {
++						multi = new MultipartRequest(request, docPathOnServer, 500 * 1000 * 1024);
++						operation = multi.getParameter("operation");
++						String token = multi.getParameter(CSRFTokenHandler.CSRF_TOKEN);
++						boolean isValid = CSRFTokenHandler.isValid(request, token);
++						if (!isValid) {
++							request.setAttribute("error.message",
++									"<p><strong>Anti CSRF token is invalid!</strong></p>");
++							request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
++						}
++					}
++					LOG.debug("after checking MULTIPART[operation=" + operation + "]");
++
++				} catch (Exception e) {
++					LOG.debug("RMailEventAction::ERROR::" + e.getMessage());
++					dbMessages.setOperationStatus(GenericDbMessages.OPERATION_STATUS_ERROR);
++					String errorMsg = I18nUtil.getString(
++							(Locale) request.getSession().getAttribute("LOGIN_USER_LOCALE"),
++							"RESQ.MASS.DATA.UPLOAD.ERROR") + e.getMessage();
++					dbMessages.setOperationMessage(errorMsg);
++					dbMessages.setOperationMessageKey(errorMsg);
++
++					request.setAttribute(GEN_DB_MESSAGES_1, genDbMessages);
++					request.setAttribute(GEN_DB_MESSAGES, dbMessages);
++					return actionDetails.getReturnPage(SHOW_MAIN_SCREEN);
++				}
++				if (StringUtils.isNotBlank(operation) && operation.trim().equalsIgnoreCase("SHOWMAINSCREEN")) {
++					request.setAttribute(GEN_DB_MESSAGES, dbMessages);
++					request.setAttribute(GEN_DB_MESSAGES_1, genDbMessages);
++					return actionDetails.getReturnPage(SHOW_MAIN_SCREEN);
++				} else if (StringUtils.isNotBlank(operation) && operation.trim().equalsIgnoreCase("UPLOAD")) {
++					try {
++						Enumeration files = multi.getFileNames();
++						fileNameString = "";
++						while (files.hasMoreElements()) {
++							String name = (String) files.nextElement();
++							fileNameString = multi.getFilesystemName(name);
++							uploadFile = docPathOnServer.concat(fileNameString);
++						}
++
++					} catch (Exception e) {
++						LOG.debug("RUploadMassDataAction::ERROR::" + e.getMessage());
++						dbMessages.setOperationStatus(GenericDbMessages.OPERATION_STATUS_ERROR);
++						String errorMsg = I18nUtil.getString(
++								(Locale) request.getSession().getAttribute("LOGIN_USER_LOCALE"),
++								"RESQ.MASS.DATA.UPLOAD.ERROR") + e.getMessage();
++						dbMessages.setOperationMessage(errorMsg);
++						dbMessages.setOperationMessageKey(errorMsg);
++
++						request.setAttribute(GEN_DB_MESSAGES_1, genDbMessages);
++						request.setAttribute(GEN_DB_MESSAGES, dbMessages);
++						return actionDetails.getReturnPage(SHOW_MAIN_SCREEN);
++					}
++
++					genDbMessages = MailEventDAO.uploadAndUpdateTheEmailEvents(uploadFile, loggedUser, locale);
++
++					LOG.debug("User Mail Event Files Uploaded : Uploaded By = " + loggedUser.getUserName() + ", Date="
++							+ new java.sql.Date(System.currentTimeMillis()) + " "
++							+ new java.sql.Time(System.currentTimeMillis()));
++
++					request.setAttribute(GEN_DB_MESSAGES_1, genDbMessages);
++					request.setAttribute(GEN_DB_MESSAGES, dbMessages);
++					return actionDetails.getReturnPage(SHOW_MAIN_SCREEN);
++				}
++			} else if (("downloadMailEventTemplate.do").equalsIgnoreCase(actionDetails.getActionId().trim())) {
++				String systemName = SystemDAO.getSystemNameFromId(loggedUser.getSystemId());
++				response.setContentType("application/vnd.ms-excel");
++				if (StringUtils.isNotBlank(systemName)) {
++					response.setHeader("Content-Disposition",
++							"attachment; filename=MailEventTemplate_" + systemName + ".xls");
++				} else {
++					response.setHeader("Content-Disposition", "attachment; filename=MailEventTemplate_.xls");
++				}
++				MailEventDAO.getXLSDownloadForMailEvent(loggedUser.getSystemId(), locale, response.getOutputStream());
++				return actionDetails.getReturnPage("downloadMailEventTemplate");
++			}
++		} catch (Exception e) {
++			XAppUtils.printStackTrace(e);
++			e.printStackTrace();
++			LOG.error("RMailEvent :: execute ::  error :: " + e.getStackTrace());
++		} finally {
++			if (xAppConnection != null) {
++				try {
++					xAppConnection.close();
++				} catch (SQLException se) {
++					LOG.error("saveApi - Exception " + se.getMessage());
++				}
++			}
++		}
++		return returnPage;
++	}
++}
+Index: source/com/greenlight/rqAdapter/utils/XAppConstants.java
+===================================================================
+--- source/com/greenlight/rqAdapter/utils/XAppConstants.java	(revision 7224)
++++ source/com/greenlight/rqAdapter/utils/XAppConstants.java	(working copy)
+@@ -1131,5 +1131,13 @@
+ 	public static String BOOLEAN_CAPS_TRUE = "TRUE";
+ 	public static String BOOLEAN_CAPS_FALSE = "FALSE";
+ 	
++	public static final String LOAD_MAIL_EVENT_FROM_DB_FOR_SYSTEM="load.mail.event.from.db.for.system";
++	public static final String MAIL_EVENT_SHEET_NAME="RESQ.UPLOAD.MAIL.EVENT.SHEET.NAME";
++	public static final String MAIL_EVENT_NAME = "RESQ.UPLOAD.MAIL.EVENT.NAME";
++	public static final String MAIL_SUBJECT_KEY= "RESQ.UPLOAD.MAIL.SUBJECT.KEY";
++	public static final String MAIL_SUBJECT_VALUE = "RESQ.UPLOAD.MAIL.SUBJECT.VALUE";
++	public static final String MAIL_BODY_KEY= "RESQ.UPLOAD.MAIL.BODY.KEY";
++	public static final String MAIL_BODY_TEXT= "RESQ.UPLOAD.MAIL.BODY.TEXT";
++	
+ 	
+ }
+Index: source/config/appNavigationConfig.xml
+===================================================================
+--- source/config/appNavigationConfig.xml	(revision 7221)
++++ source/config/appNavigationConfig.xml	(working copy)
+@@ -922,6 +922,21 @@
+ 			<RETURN_PAGE ID="ERROR" PAGE="/errorPage.jsp" />	 
+ 		</NAVIGATION>
+ 		
++		<!-- Changes related to mail event start-->
++		<NAVIGATION  SCREEN_ID="IMPORT_6"  ACTION_ID="uploadMailEvent.do"  ACTION_CLASS="com.greenlight.rqAdapter.ui.actions.resqActions.RMailEventAction">
++			<RETURN_PAGE ID="showMainScreen" PAGE="/jsp/resqJsp/mailEvent/mainScreen.jsp" />
++			<RETURN_PAGE ID="SUCCESS" PAGE="/successPage.jsp" />	 			 
++			<RETURN_PAGE ID="ERROR" PAGE="/errorPage.jsp" />	 
++		</NAVIGATION>
++		
++		<NAVIGATION  SCREEN_ID="IMPORT_7"  ACTION_ID="downloadMailEventTemplate.do"  ACTION_CLASS="com.greenlight.rqAdapter.ui.actions.resqActions.RMailEventAction">
++			<RETURN_PAGE ID="downloadMailEventTemplate" PAGE="/jsp/resqJsp/mailEvent/mainScreen.jsp" />		
++			<RETURN_PAGE ID="SUCCESS" PAGE="/successPage.jsp" />	 			 
++			<RETURN_PAGE ID="ERROR" PAGE="/errorPage.jsp" />	 
++		</NAVIGATION>
++		
++		<!-- Changes related to mail event end-->
++		
+ 		<NAVIGATION  SCREEN_ID="UPLOAD_USR_BR_1"  ACTION_ID="uploadUserBRMassData.do"  ACTION_CLASS="com.greenlight.rqAdapter.ui.actions.resqActions.UploadUserBRMassDataAction">
+ 			<RETURN_PAGE ID="uploadUserBRMassData" PAGE="/jsp/resqJsp/uploadUserBRMassData.jsp" />
+ 			<RETURN_PAGE ID="showUserBRUpload" PAGE="/jsp/resqJsp/uploadUserBRMassData.jsp" />
+Index: source/config/xplatformConfig.xml
+===================================================================
+--- source/config/xplatformConfig.xml	(revision 7221)
++++ source/config/xplatformConfig.xml	(working copy)
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <xplatformConfg>
+ 	<user_security>
+-		<authentication>UME</authentication>
++		<authentication>Native</authentication>
+ 	</user_security>
+ 	<external_vendor>
+ 		<vendorname>SAPGRC</vendorname>
+Index: source/resq_application.properties
+===================================================================
+--- source/resq_application.properties	(revision 7221)
++++ source/resq_application.properties	(working copy)
+@@ -175,4 +175,6 @@
+ show.number.of.record.page=10
+ 
+ send.ebcp.user.creation.mail=Y
+-send.ebcp.role.assignment.mail=Y
+\ No newline at end of file
++send.ebcp.role.assignment.mail=Y
++
++load.mail.event.from.db.for.system=SFSF
+\ No newline at end of file
+Index: webContent/jsp/resqJsp/mailEvent/mainScreen.jsp
+===================================================================
+--- webContent/jsp/resqJsp/mailEvent/mainScreen.jsp	(revision 0)
++++ webContent/jsp/resqJsp/mailEvent/mainScreen.jsp	(revision 0)
+@@ -0,0 +1,205 @@
++<!-- 
++name : uploadMassData.jsp
++created by : Harshad Pawar
++ -->
++<%@ page contentType="text/html; charset=UTF-8" %>
++<% response.setHeader("Pragma","no-cache");%> 
++<% response.setHeader("Cache-Control","no-store");%> 
++<% response.setDateHeader("Expires",-1);%>
++
++<%@page import="com.greenlight.rqAdapter.framework.security.UserSecurityInterface"%>
++<%@page import="com.greenlight.rqAdapter.framework.security.User"%>
++<%@page import="com.greenlight.rqAdapter.dao.GenericDbMessages"%>
++<%@page import="com.greenlight.rqAdapter.utils.XAppUtils"%>
++<%@page import="com.greenlight.rqAdapter.utils.XAppConstants"%>
++<%@page import="com.greenlight.rqAdapter.framework.messagebundle.MessagesBundle"%>
++<%@page import="com.greenlight.rqAdapter.framework.messagebundle.I18nUtil"%>
++<%@page import="java.util.Locale"%>
++<%@page import="com.greenlight.rqAdapter.framework.actionpermissions.ResQNamePermission" %>
++<%@page import="org.apache.log4j.Logger"%>
++<%@page import="com.greenlight.rqAdapter.logs.Log"%>
++<%@page import="com.greenlight.rqAdapter.dao.tables.resqTables.TableRQImport"%>
++<%@page import="com.greenlight.rqAdapter.framework.security.UMEUserSecurityImpl"%>
++<%@page import="com.greenlight.rqAdapter.ui.forms.PaginationForm"%>
++<%@page import="com.greenlight.rqAdapter.ui.forms.resqForms.RImportUsersOrRolesForm"%>
++<%@page import="com.greenlight.rqAdapter.dao.GenericDbMessages"%>
++<%@ page import="de.dominikschadow.javasecurity.csrf.CSRFTokenHandler" %> 
++<%@ taglib uri="/WEB-INF/taglibs/i18n.tld" prefix="i18n"%>
++<%@ include file="/js/paginationAndSort.js" %>
++
++<%
++	User umeUser = (User) request.getSession().getAttribute("CURRENT_USER") ;
++	String contextPath = request.getContextPath();   	
++	java.util.Locale USER_LOCALE = (java.util.Locale) request.getSession().getAttribute("LOGIN_USER_LOCALE") ;
++	GenericDbMessages genDbMessages = (GenericDbMessages)request.getAttribute("GenDbMessages1");//message for user group sheet
++	GenericDbMessages dbMessages = (GenericDbMessages)request.getAttribute("GenDbMessages");//message for business role definition sheet
++	String ui_theme = XAppUtils.getUITheme();
++	String CSRFToken=CSRFTokenHandler.getToken(request.getSession(false));
++%>
++<link href="<%= contextPath %>/css/Style_<%=ui_theme%>.css" rel="stylesheet" type="text/css">
++<script language="JavaScript" src="<%= contextPath %>/js/xapp.js"></script>
++<script language="JavaScript" src="<%= contextPath %>/js/strfunctions.js"></script>
++<script language="JavaScript" src="<%= contextPath %>/js/querymanagement.js"></script>
++<script language="JavaScript" src="<%= contextPath %>/js/numberFunctions.js"></script>
++<script language="JavaScript" src="<%= contextPath %>/js/FerantLib.js"></script>
++<script language="JavaScript" src="<%= contextPath %>/js/Calender1.js"></script>
++
++<html lang="en">
++	
++<head>
++
++<script language="javascript">
++window.setTimeout("window.parent.sessionTimeOut();", <%= session.getMaxInactiveInterval()*1000 %>);
++</script>
++</head>
++
++<body>
++	
++<form method="post" enctype="multipart/form-data">
++<input type="hidden" id="<%=CSRFTokenHandler.CSRF_TOKEN%>" name="<%=CSRFTokenHandler.CSRF_TOKEN%>" value="<%=CSRFToken%>">
++<input type="hidden" name="operation" value="UPLOAD" >
++
++
++<table width="99%" border="0" cellpadding="0" cellspacing="0">
++	<tr>
++		<td>
++		<table width="100%" border="0" cellspacing="0" cellpadding="0">
++			<tr height="21px">
++				<td width="1%" class="uiColor2">&nbsp;</td>
++				<td class="text_item_ERM_Bold_Bigger" width="97%">&nbsp;&nbsp;
++					<%= I18nUtil.getString(USER_LOCALE, "RESQ.MODIFY.MAIL.EVENT.CONTENT")%>
++				</td>
++				<td class="text_item_ERM_Bold_Bigger" width="2%"></td>
++			</tr>
++		</table>
++		<table width="100%" border="0" cellspacing="0" cellpadding="0">	<tr><td class="breadcrumb2" height="2"></td></tr></table>
++	
++	<table width='100%' height='8'  border='0' cellpadding='0' cellspacing='0'> <tr> <th height='4'  class='contents1_white' scope='row'></th> </tr> </table>
++		
++		<table width="100%" border="0" cellspacing="0" cellpadding="0">
++			<tr><td class="text_item_ERM_Bold" height="5">
++	<% if(genDbMessages != null && (genDbMessages.getOperationStatus()==  GenericDbMessages.OPERATION_STATUS_ERROR )){%>
++		<font color="#bd0000"><%= genDbMessages != null ? genDbMessages.getOperationMessage():"" %></font>
++		<% }else if(genDbMessages != null){ %>
++		<font color="#023c02"><%= genDbMessages.getOperationMessage() != null ? genDbMessages.getOperationMessage():"" %></font>
++		<% } %>
++					</td></tr>
++		</table>
++		
++		<table width="100%" border="0" cellspacing="0" cellpadding="0">
++			<tr><td class="text_item_ERM_Bold" height="5">
++					<% if(dbMessages != null && (dbMessages.getOperationStatus()==  GenericDbMessages.OPERATION_STATUS_ERROR )){%>
++					<font color="#bd0000"><%= dbMessages != null ? dbMessages.getOperationMessage():"" %></font>
++					<% }else if(dbMessages != null){ %>
++					<font color="#023c02"><%= dbMessages.getOperationMessage() != null ? dbMessages.getOperationMessage():"" %></font>
++					<% } %>
++			</td></tr>
++		</table>
++	<TABLE width="100%" class="table_border_new" width="99%" cellpadding="1" cellspacing="0" >
++	  <TBODY>
++		<TR  class="table_header_darker" height="25px">
++	    	<td align="left" colspan="8" >
++		  	</td>
++		</TR>
++		<TR >
++		 <TD >
++		 	<TABLE class="text_item_ERM" id="Table1" cellSpacing="3" cellPadding="2" width="100%" border="0">
++
++			<TR>
++			  <TD colspan="2">&nbsp;</TD>
++			</TR>
++			
++			<TR>
++			  <TD width=10% class="text_item_ERM_re"><%= I18nUtil.getString(USER_LOCALE, "RESQ.DOWNLOAD.MAIL.EVENTS.TEMPLATE.TO.MODIFY")%> :</TD>
++			  <TD width=22%>
++			  <button id ="downloadDefaultTemplate" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_UPLOAD_MASS_DATA_DOWNLOAD_TEMPLATE_BTN, request, response)%> role="button" type="button"  title="<%= I18nUtil.getString(USER_LOCALE, "DOWNLOAD.CUSTOM.DATA.SAMPLE") %>" value="Download Template"  class="BlueButton" onClick="javascript:submitEditForm('DOWNLOAD');"><%= I18nUtil.getString(USER_LOCALE, "DOWNLOAD.CUSTOM.DATA.SAMPLE") %></button>
++			  </TD>
++			</TR>		 	
++			
++			<TR>
++			  <TD width=10% class="text_item_ERM_re"><%= I18nUtil.getString(USER_LOCALE, "RESQ.UPLOAD.MAIL.EVENT.EXCEL.FILE")%> : <span id="manSpan" class="mandatory">*</span></TD>
++			  <TD width=22%>
++			  <span id="valideto_outer1">
++			  	<span id="validefrom_outer2">
++					<span id="valideto_outer3">
++						<span id="validefrom_outer4"> 
++							<input id="systemDesc" name="systemDesc" type="file" role="textbox" class="input235" value=""  maxlength="150" aria-label="ChooseFile"  accept=".xls"/>
++						</span>	
++					</span>          
++				</span>
++			  </span> &nbsp;&nbsp;				
++			<button id ="uploadMassData" role="button" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_UPLOAD_MASS_DATA_UPLOAD_BTN, request, response) %>  type="button"  title="<%= I18nUtil.getString(USER_LOCALE, "ResQ.Upload") %>" value="Upload"  class="BlueButton" onClick="javascript:submitEditForm('UPLOAD');"><%= I18nUtil.getString(USER_LOCALE, "ResQ.Upload") %></button>
++		
++			</TR>		 	
++
++	<table width='100%' height='8'  border='0' cellpadding='0' cellspacing='0'> <tr> <th height='4'  class='contents1_white' scope='row'></th> </tr> </table>
++	</TABLE>
++	<TABLE width="99%" border="0" cellpadding="0" cellspacing="0">
++		<TR align="left" colspan="8">
++			 <td style="#98B8E4 1px solid;color: #bd0000" align="left" class="text_item_ERM"><%=I18nUtil.getString(USER_LOCALE, "RESQ.MASS.DATA.UPLOAD.NOTE.FOR.UPDATE.DOWNLOADED.TEMPLATE.FILE")%> :
++			 	<ul>
++			 		<li><%=I18nUtil.getString(USER_LOCALE, "RESQ.MASS.DATA.UPLOAD.NOTE.FOR.DELETING.DATA")%></li>
++			 		<li><%=I18nUtil.getString(USER_LOCALE, "RESQ.MASS.DATA.UPLOAD.NOTE.FOR.BLANK.RECORD")%></li>
++			 	</ul>
++			 </td>
++		</TR>
++	</TABLE>
++</TD>
++</TR>
++</TBODY>
++</TABLE>
++</td>
++</tr>
++</table>
++</form>
++</body>
++
++<script>
++
++	var wind="";
++	function OpenExcel(){
++	    wind=window.open("\Templates\\UploadBRMassData.xlsx","Report");
++	    wind.window.focus();
++	}
++	
++	function submitEditForm(operation){
++		var errorCode = 0 ;
++		
++		if(document.forms[0].systemDesc.value.length <0){
++			document.forms[0].systemDesc.className = "input235_man"
++			errorCode = 1 ;
++			return false;
++		}
++		
++		if( operation == 'UPLOAD' ){
++			var sFileName = document.forms[0].systemDesc.value;
++			var sCurExtension=".xls";
++			if( trim(document.forms[0].systemDesc.value) == '' ){
++				document.forms[0].systemDesc.className = 'input235_man'; 			
++				errorCode = 1 ;
++			}else if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() != sCurExtension.toLowerCase()) {
++				alert("Invalid file uploaded. Please upload xml file.");
++				errorCode = 1 ;
++				return false;
++	        }else{
++				document.forms[0].operation.value = 'UPLOAD' ;
++				document.forms[0].action = 'uploadMailEvent.do' ;
++			} 
++		}else if( operation == 'DOWNLOAD' ){ 
++			document.forms[0].operation.value =  'Download Template';
++			document.forms[0].action = 'downloadMailEventTemplate.do';
++		}
++				
++		if(errorCode == 0){
++		    try{
++				//document.getElementById("uploadMassData").disabled=true;
++				document.forms[0].submit() ;
++			}catch(e){
++					alert("<%= I18nUtil.getString(USER_LOCALE, "CROSSAPP.XML.VALLIDATION.INJSP") %>");
++			}
++		}else{
++			return false;
++		}
++	}
++</script>
++</html>
+\ No newline at end of file
+Index: webContent/rq_resq_left_nav.jsp
+===================================================================
+--- webContent/rq_resq_left_nav.jsp	(revision 7196)
++++ webContent/rq_resq_left_nav.jsp	(working copy)
+@@ -273,6 +273,8 @@
+ 						<li role="none"  class="icon_margin" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_IMPT_ROL, request, response) %>><a role="treeitem" href="<%= contextPath %>/searchImportUsersOrRoles.do?ImportType=U" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_IMPT_ROL, request, response) %> role="link" onclick='boldAnchor(this);' id='importUsers' target='iframe2' class='treelink' id='1819'>&nbsp;&nbsp;&nbsp;&nbsp;<span style="width:100%; padding-top:2px; padding-bottom:2px">&nbsp;&nbsp;<img alt="" class="menuImageDot" src="" border="0" align="absbottom">&nbsp;<%= I18nUtil.getString(USER_LOCALE, "IMPORT.USERS") %></a></li>
+ 						<li role="none" class="icon_margin" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_IMPT_USR, request, response) %> ><a role="treeitem" href="<%= contextPath %>/searchImportUsersOrRoles.do?ImportType=R" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_IMPT_USR, request, response) %> role="link" onclick='boldAnchor(this);' id='importRoles' target='iframe2' class='treelink' id='1818'>&nbsp;&nbsp;&nbsp;&nbsp;<span style="width:100%; padding-top:2px; padding-bottom:2px">&nbsp;&nbsp;<img alt=""  class="menuImageDot" src="" border="0" align="absbottom">&nbsp;<%= I18nUtil.getString(USER_LOCALE, "IMPORT.ROLES") %></a></li>
+ 						<li role="none"class="icon_margin"  <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_UPLOAD_MASS_DATA_BTN, request, response) %> ><a role="treeitem" href="<%= contextPath %>/uploadMassData.do?operation=ShowUpload" <%=XAppConstants.userSecurityInterface.getButtonStatus(umeUser, ResQNamePermission.RESQ_UPLOAD_MASS_DATA_BTN, request, response) %> role="link" onclick='boldAnchor(this);' id='uploadMassData' target='iframe2' class='treelink' id='1820'>&nbsp;&nbsp;&nbsp;&nbsp;<span style="width:100%; padding-top:2px; padding-bottom:2px">&nbsp;&nbsp;<img alt=""  aria-label="<%= I18nUtil.getString(USER_LOCALE, "RESQ.UPLOAD.BUSINESS.ROLES.DATA") %>" class="menuImageDot" src="" border="0" align="absbottom">&nbsp;<%= I18nUtil.getString(USER_LOCALE, "RESQ.UPLOAD.BUSINESS.ROLES.DATA") %></a></li>
++						<li role="none"class="icon_margin"><a role="treeitem" href="<%= contextPath %>/uploadMailEvent.do?operation=showMainScreen"  role="link" onclick='boldAnchor(this);' id='mailEvent' target='iframe2' class='treelink' id='1820'>&nbsp;&nbsp;&nbsp;&nbsp;<span style="width:100%; padding-top:2px; padding-bottom:2px">&nbsp;&nbsp;<img alt=""  aria-label="<%= I18nUtil.getString(USER_LOCALE, "RESQ.MODIFY.MAIL.EVENT.CONTENT") %>" class="menuImageDot" src="" border="0" align="absbottom">&nbsp;<%= I18nUtil.getString(USER_LOCALE, "RESQ.MODIFY.MAIL.EVENT.CONTENT") %></a></li>
++						
+ 						<%
+ 						boolean isShowBusinessRoleInSystem=XAppUtils.isAvailableProperty(XAppConstants.SHOW_BUSI_ROLE_IN_SYSTEM,umeUser.getSystemId());
+ 						if(isShowBusinessRoleInSystem){ %>
